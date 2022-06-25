@@ -1,0 +1,26 @@
+version: "3"
+services:
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    tty: true
+    volumes:
+      - ./api:/app
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql/mysql-server:5.7
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - '3306:3306'
+    environment:
+      TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+    volumes:
+      - /var/lib/mysql
+    env_file:
+      - ./.env
