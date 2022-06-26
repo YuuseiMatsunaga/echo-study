@@ -12,4 +12,4 @@ docker-compose up
 docker-compose exec api sql-migrate up
 ```
 
-[ここにアクセスしてみてhello worldが出てたら完了です](http://localhost:8080)
+[ここにアクセスしてみてhelth check OKが出てたら完了です](http://localhost:8080)
