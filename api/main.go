@@ -9,7 +9,7 @@ import (
 	// "github.com/labstack/echo/v4/middleware"
 )
 
-func hello(c echo.Context) error {
+func healthCheck(c echo.Context) error {
 	database.Connect()
 	sqlDB, _ := database.DB.DB()
 	defer sqlDB.Close()
@@ -17,7 +17,7 @@ func hello(c echo.Context) error {
 	if err != nil {
 	  return c.String(http.StatusInternalServerError, "データベース接続失敗")
 	} else {
-	  return c.String(http.StatusOK, "Hello, World!")
+	  return c.String(http.StatusOK, "200, OK")
 	}
   }
   
@@ -25,13 +25,15 @@ func hello(c echo.Context) error {
 	e := echo.New()
 	database.Connect()
 	sqlDB, _ := database.DB.DB()
-	defer sqlDB.Close()
 
-	e.GET("/", hello)
+	// routes
+	e.GET("/", healthCheck)
 	e.GET("/users", controllers.GetUsers)
 	e.GET("/users/:id", controllers.GetUser)
 	e.POST("/users", controllers.CreateUser)
 	e.PATCH("/users/:id", controllers.UpdateUser)
 	e.DELETE("/users/:id", controllers.DeleteUser)
+	
+	defer sqlDB.Close()
 	e.Logger.Fatal(e.Start(":8080"))
   }
