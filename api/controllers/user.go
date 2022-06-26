@@ -5,28 +5,17 @@ import (
   "net/http"
   "github.com/labstack/echo/v4"
   "time"
-  "strconv"
-  // "echo/model"
+  "echo/entities"
 )
 
-type User struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	CreatedAt string `json:created_at`
-  }
-  
-
 func GetUsers(c echo.Context) error {
-  users := []User{}
+  users := []entities.User{}
   database.DB.Find(&users)
   return c.JSON(http.StatusOK, users)
 }
 
 func GetUser(c echo.Context) error {
-  userId, _ := strconv.Atoi(c.Param("id"))
-  user := User{Id: userId}
-  database.DB.Find(&user)
+  user := setUser(c.Param("id"))
 
   if user.Name == "" {
     return c.JSON(http.StatusOK, nil) 
@@ -36,17 +25,17 @@ func GetUser(c echo.Context) error {
 }
 
 func CreateUser(c echo.Context) error {
-  user := User{}
+  user := new(entities.User)
   if err := c.Bind(&user); err != nil {
     return err
   }
-  user.CreatedAt = setNow()
+  user.CreatedAt = time.Now()
   database.DB.Create(&user)
   return c.JSON(http.StatusOK, user)
 }
 
 func UpdateUser(c echo.Context) error {
-  user := User{}
+  user := setUser(c.Param("id"))
   if err := c.Bind(&user); err != nil {
     return err
   }
@@ -56,11 +45,12 @@ func UpdateUser(c echo.Context) error {
 
 func DeleteUser(c echo.Context) error {
   id := c.Param("id")
-  database.DB.Delete(&User{}, id)
+  database.DB.Delete(&entities.User{}, id)
   return c.NoContent(http.StatusNoContent)
 }
 
-func setNow() string {
-  now := time.Now()
-  return now.Format("2006-01-02 15:04:05") 
+func setUser(id string) entities.User {
+  user := entities.User{}
+  database.DB.First(&user, id)
+  return user
 }
